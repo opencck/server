@@ -59,11 +59,11 @@ jobs:
                   php-version: ${{ matrix.php-version }}
                   extensions: ${{ env.PHP_EXTENSIONS }}
                   ini-values: ${{ env.PHP_INI_VALUES }}
-                  coverage: pcov
-                  tools: none
+                  coverage: none
+                  tools: composer:v2, phpunit:9.6.3
 
             - name: Install dependencies with Composer
-              run: ./tools/composer update --no-ansi --no-interaction --no-progress
+              run: composer update --no-ansi --no-interaction --no-progress
 
             - name: Run tests with PHPUnit
-              run: ./phpunit --testsuite end-to-end
+              run: phpunit --testsuite end-to-end
