@@ -1,7 +1,7 @@
 {
     "name": "opencck/server",
     "description": "HTTP/WS/SSE non-blocking server based on revolt event loop and amphp-v3",
-    "version": "0.9.1",
+    "version": "0.9.2",
     "license": "MIT",
     "require": {
         "amphp/http": "v2.0.0-beta.1",
