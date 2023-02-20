@@ -152,7 +152,7 @@ $router->addRoute(
 );
 
 // set static files from directory for fallback
-$dir = __DIR__ . '/public';
+$dir = __DIR__ . DIRECTORY_SEPARATOR . 'public';
 if (!is_dir($dir)) {
     mkdir($dir);
 }

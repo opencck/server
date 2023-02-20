@@ -140,7 +140,9 @@ final class HttpServerTest extends AsyncTestCase {
             })
         );
         $errorHandler = new DefaultErrorHandler();
-        $router->setFallback(new DocumentRoot($this->httpServer, $errorHandler, __DIR__ . '/resources'));
+        $router->setFallback(
+            new DocumentRoot($this->httpServer, $errorHandler, __DIR__ . DIRECTORY_SEPARATOR . 'resources')
+        );
         $this->httpServer->start($router, $errorHandler);
 
         $httpRequest = $this->httpClient->request(new Client\Request('http://127.0.0.1:' . self::PORT, 'GET'));
