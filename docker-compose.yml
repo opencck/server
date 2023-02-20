@@ -1,0 +1,12 @@
+version: '3'
+services:
+    php:
+        restart: always
+        build:
+            context: .
+        ports:
+            - '8080:8080'
+#        volumes:
+#            - .:/app/
+        env_file:
+            - .env
