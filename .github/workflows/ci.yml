@@ -60,10 +60,10 @@ jobs:
                   extensions: ${{ env.PHP_EXTENSIONS }}
                   ini-values: ${{ env.PHP_INI_VALUES }}
                   coverage: none
-                  tools: composer:v2, phpunit:9.6.3
+                  tools: composer:v2
 
             - name: Install dependencies with Composer
               run: composer update --no-ansi --no-interaction --no-progress
 
             - name: Run tests with PHPUnit
-              run: phpunit --testsuite end-to-end
+              run: ./vendor/phpunit --testsuite end-to-end
