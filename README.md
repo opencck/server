@@ -12,6 +12,8 @@ This package provides a non-blocking HTTP/1.1 and HTTP/2 application server (wit
 This package can be installed as a [Composer](https://getcomposer.org/) dependency.
 
 ```bash
+#echo "{}" > composer.json #if create new project
+composer config minimum-stability dev
 composer require opencck/server
 ```
 
