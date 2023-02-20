@@ -98,7 +98,7 @@ $router->addRoute(
         return new Response(
             HttpStatus::OK,
             ['content-type' => 'text/html; charset=utf-8'],
-            '<!DOCTYPE html><html lang="en"><body><pre>' . print_r($form->getValues()) . '</pre></body></html>'
+            '<!DOCTYPE html><html lang="en"><body><pre>' . print_r($form->getValues(), true) . '</pre></body></html>'
         );
     })
 );
