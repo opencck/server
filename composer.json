@@ -14,7 +14,7 @@
         "amphp/log": "v2.0.0-beta.2"
     },
     "require-dev": {
-        "phpunit/phpunit": "9.4.*",
+        "phpunit/phpunit": "9^",
         "amphp/phpunit-util": "^3",
         "amphp/http-client": "v5.0.0-beta.11",
         "amphp/websocket-client": "v2.0.0-beta.3"
