@@ -27,6 +27,9 @@ composer require opencck/server
 ```php
 <?php
 
+use Amp\Http\Server\Driver\ConnectionLimitingClientFactory;
+use Amp\Http\Server\Driver\ConnectionLimitingServerSocketFactory;
+use Amp\Http\Server\Driver\SocketClientFactory;
 use Amp\Http\Server\SocketHttpServer;
 use Amp\Http\Server\DefaultErrorHandler;
 use Amp\Http\Server\RequestHandler\ClosureRequestHandler;
@@ -37,6 +40,7 @@ use Amp\Http\Server\StaticContent\DocumentRoot;
 use Amp\Http\Server\FormParser;
 use Amp\Http\HttpStatus;
 
+use Amp\Sync\LocalSemaphore;
 use Amp\Websocket\Server\Websocket;
 use Amp\Websocket\Server\WebsocketGateway;
 use Amp\Websocket\Server\WebsocketClientGateway;
@@ -77,7 +81,13 @@ $logger = new Logger('server');
 $logger->pushHandler($logHandler);
 
 // server
-$server = new SocketHttpServer($logger);
+$serverSocketFactory = new ConnectionLimitingServerSocketFactory(new LocalSemaphore(maxLocks: 1000));
+$clientFactory = new ConnectionLimitingClientFactory(
+    clientFactory: new SocketClientFactory($logger),
+    logger: $logger,
+    connectionsPerIpLimit: 10
+);
+$server = new SocketHttpServer($logger, $serverSocketFactory, $clientFactory);
 
 // router
 $errorHandler = new DefaultErrorHandler();
