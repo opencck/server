@@ -131,3 +131,6 @@ robots.txt
 
 # Ignore Service Worker
 sw.*
+
+# Packages
+/packages

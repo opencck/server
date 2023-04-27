@@ -1,5 +1,8 @@
-<?php
+﻿<?php
 
+use Amp\Http\Server\Driver\ConnectionLimitingClientFactory;
+use Amp\Http\Server\Driver\ConnectionLimitingServerSocketFactory;
+use Amp\Http\Server\Driver\SocketClientFactory;
 use Amp\PHPUnit\AsyncTestCase;
 
 use Amp\Http\Server;
@@ -9,6 +12,7 @@ use Amp\Http\Server\Response;
 
 use Amp\Http\Client\HttpException;
 
+use Amp\Sync\LocalSemaphore;
 use Amp\Websocket\Server\Websocket;
 use Amp\Websocket\Server\WebsocketGateway;
 use Amp\Websocket\Server\WebsocketClientGateway;
@@ -40,7 +44,11 @@ final class WsServerTest extends AsyncTestCase {
     /**
      * Server port
      */
-    const PORT = 1339;
+    private const PORT = 1339;
+
+    private const DEFAULT_CONNECTION_LIMIT = 1000;
+    private const DEFAULT_CONNECTIONS_PER_IP_LIMIT = 10;
+
     /**
      * @var SocketHttpServer
      */
@@ -88,7 +96,16 @@ final class WsServerTest extends AsyncTestCase {
             }
         );
 
-        $this->httpServer = new SocketHttpServer($logger);
+        $serverSocketFactory = new ConnectionLimitingServerSocketFactory(
+            new LocalSemaphore(self::DEFAULT_CONNECTION_LIMIT)
+        );
+        $clientFactory = new ConnectionLimitingClientFactory(
+            new SocketClientFactory($logger),
+            $logger,
+            self::DEFAULT_CONNECTIONS_PER_IP_LIMIT
+        );
+
+        $this->httpServer = new SocketHttpServer($logger, $serverSocketFactory, $clientFactory);
         $this->httpServer->expose(new Socket\InternetAddress('127.0.0.1', self::PORT));
         $this->httpServer->expose(new Socket\InternetAddress('[::]', self::PORT));
 
