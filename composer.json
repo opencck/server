@@ -11,7 +11,7 @@
         "amphp/http-server-form-parser": "v2.0.0-beta.3",
         "amphp/websocket": "v2.0.0-beta.4",
         "amphp/websocket-server": "v3.0.0-beta.2",
-        "amphp/log": "v2.0.0-beta.2"
+        "amphp/log": "v2.0.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9",
