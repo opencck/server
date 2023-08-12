@@ -91,7 +91,7 @@ $server = new SocketHttpServer($logger, $serverSocketFactory, $clientFactory);
 
 // router
 $errorHandler = new DefaultErrorHandler();
-$router = new Router($server, $errorHandler);
+$router = new Router($server, $logger, $errorHandler);
 
 // http route (GET)
 $router->addRoute(

@@ -53,6 +53,11 @@ final class HttpServerTest extends AsyncTestCase {
     private HttpClient $httpClient;
 
     /**
+     * @var Logger
+     */
+    private Logger $logger;
+
+    /**
      * @throws Socket\SocketException
      */
     protected function setUp(): void {
@@ -62,19 +67,19 @@ final class HttpServerTest extends AsyncTestCase {
         $logHandler->setFormatter(new ConsoleFormatter());
         $logHandler->setLevel(Level::Info);
 
-        $logger = new Logger('server');
-        $logger->pushHandler($logHandler);
+        $this->logger = new Logger('server');
+        $this->logger->pushHandler($logHandler);
 
         $serverSocketFactory = new ConnectionLimitingServerSocketFactory(
             new LocalSemaphore(self::DEFAULT_CONNECTION_LIMIT),
         );
         $clientFactory = new ConnectionLimitingClientFactory(
-            new SocketClientFactory($logger),
-            $logger,
+            new SocketClientFactory($this->logger),
+            $this->logger,
             self::DEFAULT_CONNECTIONS_PER_IP_LIMIT,
         );
 
-        $this->httpServer = new SocketHttpServer($logger, $serverSocketFactory, $clientFactory);
+        $this->httpServer = new SocketHttpServer($this->logger, $serverSocketFactory, $clientFactory);
         $this->httpServer->expose(new Socket\InternetAddress('127.0.0.1', self::PORT));
         $this->httpServer->expose(new Socket\InternetAddress('[::]', self::PORT));
 
@@ -141,7 +146,7 @@ final class HttpServerTest extends AsyncTestCase {
      * @throws CompositeException
      */
     public function testRouter() {
-        $router = new Router($this->httpServer, new DefaultErrorHandler());
+        $router = new Router($this->httpServer, $this->logger, new DefaultErrorHandler());
         $genericRequestHandler = new ClosureRequestHandler(function (): Response {
             return new Response(HttpStatus::OK, ['content-type' => 'text/plain; charset=utf-8'], 'Hello, World!');
         });
