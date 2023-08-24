@@ -4,7 +4,7 @@
     "version": "0.9.10",
     "license": "MIT",
     "require": {
-        "amphp/http": "v2.0.0",
+        "amphp/http": "v2.1.0",
         "amphp/http-server": "v3.1.0",
         "amphp/http-server-router": "v2.0.0",
         "amphp/http-server-static-content": "v2.0.0",
