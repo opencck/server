@@ -111,7 +111,7 @@ final class HttpServerTest extends AsyncTestCase {
     }
 
     /**
-     * @see \Amp\Http\Server\FormParser\parseForm
+     * @see Amp\Http\Server\FormParser\Form
      * @throws Throwable
      * @throws CompositeException
      * @throws StreamException
@@ -119,7 +119,7 @@ final class HttpServerTest extends AsyncTestCase {
     public function testFormParser() {
         $this->httpServer->start(
             new ClosureRequestHandler(function (Server\Request $request): Response {
-                $form = FormParser\parseForm($request);
+                $form = FormParser\Form::fromRequest($request);
                 $values = $form->getValues();
                 return new Response(
                     HttpStatus::OK,
