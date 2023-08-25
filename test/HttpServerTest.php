@@ -119,7 +119,7 @@ final class HttpServerTest extends AsyncTestCase {
     public function testFormParser() {
         $this->httpServer->start(
             new ClosureRequestHandler(function (Server\Request $request): Response {
-                $form = FormParser\Form::fromRequest($request);
+                $form = FormParser\Form::fromRequest($request, new FormParser\FormParser(1024));
                 $values = $form->getValues();
                 return new Response(
                     HttpStatus::OK,

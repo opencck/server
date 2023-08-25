@@ -131,7 +131,7 @@ $router->addRoute(
     method: 'POST',
     uri: '/',
     requestHandler: new ClosureRequestHandler(function (Request $request): Response {
-        $form = FormParser\parseForm($request, return_bytes(ini_get('post_max_size')));
+        $form = FormParser\Form::fromRequest($request, new FormParser\FormParser(return_bytes(ini_get('post_max_size'))));
         return new Response(
             HttpStatus::OK,
             ['content-type' => 'text/html; charset=utf-8'],
