@@ -13,11 +13,11 @@ use Amp\Http\Server\Response;
 use Amp\Http\Client\HttpException;
 
 use Amp\Sync\LocalSemaphore;
+use Amp\Websocket\Server\Rfc6455Acceptor;
 use Amp\Websocket\Server\Websocket;
 use Amp\Websocket\Server\WebsocketGateway;
 use Amp\Websocket\Server\WebsocketClientGateway;
 use Amp\Websocket\Server\WebsocketClientHandler;
-use Amp\Websocket\Server\EmptyWebsocketHandshakeHandler;
 use Amp\Websocket\WebsocketClient;
 
 use Amp\Websocket\Client\Rfc6455ConnectionFactory;
@@ -73,29 +73,6 @@ final class WsServerTest extends AsyncTestCase {
 
         $logger = new Logger('server');
         $logger->pushHandler($logHandler);
-
-        $this->gateway = new WebsocketClientGateway();
-        $websocketRequestHandler = new Websocket(
-            logger: $logger,
-            handshakeHandler: new EmptyWebsocketHandshakeHandler(),
-            clientHandler: new class ($this->gateway) implements WebsocketClientHandler {
-                public function __construct(private readonly WebsocketGateway $gateway = new WebsocketClientGateway()) {
-                }
-
-                public function handleClient(
-                    WebsocketClient $client,
-                    Server\Request $request,
-                    Response $response
-                ): void {
-                    $this->gateway->addClient($client);
-
-                    while ($message = $client->receive()) {
-                        $this->gateway->broadcast($message->read());
-                    }
-                }
-            }
-        );
-
         $serverSocketFactory = new ConnectionLimitingServerSocketFactory(
             new LocalSemaphore(self::DEFAULT_CONNECTION_LIMIT)
         );
@@ -108,6 +85,29 @@ final class WsServerTest extends AsyncTestCase {
         $this->httpServer = new SocketHttpServer($logger, $serverSocketFactory, $clientFactory);
         $this->httpServer->expose(new Socket\InternetAddress('127.0.0.1', self::PORT));
         $this->httpServer->expose(new Socket\InternetAddress('[::]', self::PORT));
+
+        $this->gateway = new WebsocketClientGateway();
+        $websocketRequestHandler = new Websocket(
+            httpServer: $this->httpServer,
+            logger: $logger,
+            acceptor: new Rfc6455Acceptor(),
+            clientHandler: new class ($this->gateway) implements WebsocketClientHandler {
+                public function __construct(private readonly WebsocketGateway $gateway = new WebsocketClientGateway()) {
+                }
+
+                public function handleClient(
+                    WebsocketClient $client,
+                    Server\Request $request,
+                    Response $response
+                ): void {
+                    $this->gateway->addClient($client);
+
+                    while ($message = $client->receive()) {
+                        $this->gateway->broadcastText($message->read());
+                    }
+                }
+            }
+        );
 
         try {
             $this->httpServer->start($websocketRequestHandler, new DefaultErrorHandler());
@@ -142,7 +142,7 @@ final class WsServerTest extends AsyncTestCase {
             $connection->close();
         });
         EventLoop::queue(function () use ($connection) {
-            $connection->send('Hello, Sending!');
+            $connection->sendText('Hello, Sending!');
         });
         delay(0.1);
     }
@@ -159,7 +159,7 @@ final class WsServerTest extends AsyncTestCase {
             $connection->close();
         });
         EventLoop::queue(function () {
-            $this->gateway->broadcast('Hello, Receipt!');
+            $this->gateway->broadcastText('Hello, Receipt!');
         });
         delay(0.1);
     }

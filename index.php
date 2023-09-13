@@ -18,7 +18,7 @@ use Amp\Websocket\Server\Websocket;
 use Amp\Websocket\Server\WebsocketGateway;
 use Amp\Websocket\Server\WebsocketClientGateway;
 use Amp\Websocket\Server\WebsocketClientHandler;
-use Amp\Websocket\Server\OriginWebsocketHandshakeHandler;
+use Amp\Websocket\Server\AllowOriginAcceptor;
 use Amp\Websocket\WebsocketClient;
 
 use Amp\Log\ConsoleFormatter;
@@ -119,8 +119,9 @@ $router->addRoute(
     method: 'GET',
     uri: '/ws',
     requestHandler: new Websocket(
+        httpServer: $server,
         logger: $logger,
-        handshakeHandler: new OriginWebsocketHandshakeHandler([
+        acceptor: new AllowOriginAcceptor([
             'http://' . ($_ENV['HOST_MACHINE_IP'] ?? '127.0.0.1') . ':8080',
             'http://localhost:8080',
             'http://[::1]:8080',
@@ -133,7 +134,7 @@ $router->addRoute(
                 $this->gateway->addClient($client);
 
                 while ($message = $client->receive()) {
-                    $this->gateway->broadcast($message->read());
+                    $this->gateway->broadcastText($message->read());
                 }
             }
         }
@@ -170,7 +171,7 @@ $router->setFallback(new DocumentRoot($server, $errorHandler, $dir));
 
 // send micro time every 1 second to all WS clients
 EventLoop::repeat(1, static function () use ($gateway) {
-    $gateway->broadcast(microtime(true));
+    $gateway->broadcastText(microtime(true));
 });
 
 // handle event loop errors
