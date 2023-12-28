@@ -17,7 +17,7 @@
         "phpunit/phpunit": "^9",
         "amphp/phpunit-util": "^3",
         "amphp/http-client": "v5.0.1",
-        "amphp/websocket-client": "v2.0.0-beta.4"
+        "amphp/websocket-client": "v2.0.0"
     },
     "minimum-stability": "dev"
 }
